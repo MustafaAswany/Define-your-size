@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cadulli — تحديد مقاس مشد أو كورسيه</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #F7F5F0; font-family: 'Segoe UI', Tahoma, sans-serif; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 2rem 1rem; }
+  .app { background: #fff; border-radius: 16px; box-shadow: 0 2px 20px rgba(0,0,0,0.08); max-width: 680px; width: 100%; padding: 2rem 2rem; }
+
+  .brand { font-size: 22px; font-weight: 500; letter-spacing: 4px; color: #1A1A1A; text-align: center; text-transform: uppercase; }
+  .brand-sub { font-size: 11px; letter-spacing: 0.5px; color: #888; text-align: center; margin: 5px 0 1.5rem; }
+  .v-tag { font-size: 9px; color: #C4973A; letter-spacing: 1px; vertical-align: middle; margin-right: 5px; font-weight: 600; }
+
+  .div-line { height: 1px; background: #EEE; margin-bottom: 1.5rem; position: relative; }
+  .div-line::after { content: ''; position: absolute; top: -3px; left: 50%; transform: translateX(-50%); width: 36px; height: 6px; background: #C4973A; border-radius: 3px; }
+
+  .tabs { display: flex; gap: 8px; margin-bottom: 1.5rem; }
+  .tab { flex: 1; padding: 10px; text-align: center; font-size: 13px; font-weight: 500; border-radius: 8px; border: 1px solid #E5E5E5; cursor: pointer; background: #F7F5F0; color: #888; transition: all 0.15s; }
+  .tab.active { background: #C4973A; color: #fff; border-color: #C4973A; }
+
+  .section { display: none; }
+  .section.visible { display: block; }
+
+  .block-label { font-size: 10px; font-weight: 600; color: #999; letter-spacing: 1.5px; margin-bottom: 10px; text-transform: uppercase; }
+
+  .opt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 1.25rem; }
+  .opt-btn { padding: 12px 6px; text-align: center; font-size: 13px; font-weight: 500; border-radius: 8px; border: 1px solid #E5E5E5; cursor: pointer; background: #F7F5F0; color: #555; transition: all 0.1s; user-select: none; }
+  .opt-btn:hover { border-color: #C4973A; }
+  .opt-btn.sel { background: #F5E6C8; color: #7A5A1A; border-color: #C4973A; }
+
+  .sep { height: 1px; background: #EEE; margin: 0.25rem 0 1.5rem; position: relative; }
+  .sep-txt { position: absolute; top: -9px; left: 50%; transform: translateX(-50%); background: #fff; padding: 0 10px; font-size: 10px; color: #AAA; letter-spacing: 1px; white-space: nowrap; }
+
+  .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 1.25rem; }
+  .field-label { font-size: 12px; color: #777; margin-bottom: 8px; }
+  .stepper { display: flex; align-items: center; border: 1px solid #DDD; border-radius: 8px; overflow: hidden; background: #fff; transition: border-color 0.15s; }
+  .stepper:focus-within { border-color: #C4973A; }
+  .stepper-btn { width: 42px; height: 46px; border: none; background: #F7F5F0; color: #555; font-size: 20px; font-weight: 300; cursor: pointer; flex-shrink: 0; transition: background 0.1s; display: flex; align-items: center; justify-content: center; user-select: none; }
+  .stepper-btn:hover { background: #F5E6C8; color: #7A5A1A; }
+  .stepper-btn:active { background: #C4973A; color: #fff; }
+  .stepper input[type=number] { flex: 1; border: none; outline: none; text-align: center; font-size: 16px; font-weight: 600; color: #1A1A1A; font-family: inherit; background: transparent; min-width: 0; padding: 0; height: 46px; -moz-appearance: textfield; }
+  .stepper input[type=number]::-webkit-outer-spin-button,
+  .stepper input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .stepper input[type=number]::placeholder { color: #CCC; font-size: 13px; font-weight: 400; }
+
+  .fat-section { display: none; }
+  .fat-section.visible { display: block; }
+  .fat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 1.25rem; }
+
+  .result-wrap { display: none; border-radius: 12px; border: 1px solid #E5E5E5; overflow: hidden; margin-top: 1rem; }
+  .result-wrap.visible { display: block; }
+  .result-inner { padding: 1.5rem 1rem; text-align: center; background: #fff; }
+  .result-size { font-size: 64px; font-weight: 500; color: #C4973A; line-height: 1; }
+  .result-size.invalid { font-size: 20px; color: #C0392B; padding: 0.5rem 0; }
+  .result-lbl { font-size: 12px; color: #999; margin-top: 6px; margin-bottom: 14px; }
+  .result-div { height: 1px; background: #EEE; margin-bottom: 12px; }
+  .chips { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+  .chip { background: #F7F5F0; border-radius: 20px; padding: 4px 12px; font-size: 12px; color: #888; }
+  .chip b { font-weight: 600; color: #333; }
+  .note-bar { padding: 10px 14px; background: #FDF8EE; border-top: 1px solid #EED9A0; font-size: 12px; color: #7A5A1A; line-height: 1.6; text-align: right; display: none; }
+  .note-bar.visible { display: block; }
+  .note-bar.danger { background: #FEF0EF; border-top-color: #F5C6C6; color: #C0392B; }
+  .reset-btn { display: block; width: calc(100% - 2rem); margin: 10px auto; padding: 9px; background: transparent; color: #999; border: 1px solid #E5E5E5; border-radius: 8px; font-size: 13px; cursor: pointer; font-family: inherit; }
+  .reset-btn:hover { background: #F7F5F0; }
+
+  .size-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1rem; }
+  .sc { background: #fff; border: 1px solid #E5E5E5; border-radius: 12px; padding: 1rem; text-align: center; }
+  .sc-badge { font-size: 26px; font-weight: 500; color: #C4973A; display: block; margin-bottom: 8px; }
+  .sc-div { height: 1px; background: #EEE; margin: 8px 0; }
+  .sc-row { display: flex; justify-content: space-between; margin: 4px 0; }
+  .sc-lbl { font-size: 10px; color: #999; }
+  .sc-val { font-size: 10px; font-weight: 500; color: #333; }
+  .jp { display: inline-block; background: #F5E6C8; color: #7A5A1A; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-top: 6px; }
+  .note-b { background: #F7F5F0; border-radius: 8px; padding: 10px 14px; border-right: 3px solid #C4973A; margin-bottom: 8px; }
+  .note-b p { font-size: 12px; color: #666; line-height: 1.7; }
+  .dot { display: inline-block; width: 5px; height: 5px; background: #C4973A; border-radius: 50%; margin-left: 5px; vertical-align: middle; }
+
+  .info-section-title { font-size: 10px; font-weight: 600; color: #999; letter-spacing: 1.5px; text-transform: uppercase; margin: 1.25rem 0 10px; }
+  .info-card { border: 1px solid #E5E5E5; border-radius: 12px; overflow: hidden; margin-bottom: 10px; }
+  .info-card-header { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: #F7F5F0; border-bottom: 1px solid #EEE; }
+  .info-icon { font-size: 16px; }
+  .info-title { font-size: 13px; font-weight: 600; color: #1A1A1A; flex: 1; }
+  .info-tag { font-size: 10px; font-weight: 600; padding: 2px 10px; border-radius: 20px; }
+  .info-tag.suitable { background: #E6F4EA; color: #2D7A4F; }
+  .info-body { padding: 12px 14px; }
+  .info-body p { font-size: 12px; color: #555; margin-bottom: 10px; line-height: 1.6; }
+  .info-rule { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 8px; font-size: 12px; color: #555; line-height: 1.6; }
+  .info-rule:last-child { margin-bottom: 0; }
+  .rule-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+  .rule-dot.green { background: #2D7A4F; }
+  .rule-dot.orange { background: #C4973A; }
+  .rule-dot.red { background: #C0392B; }
+
+  .footer { text-align: center; margin-top: 1.5rem; font-size: 11px; }
+  .footer a { color: #C4973A; text-decoration: none; font-weight: 600; letter-spacing: 2px; }
+  .footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="brand">Cadulli</div>
+  <div class="brand-sub">تحديد مقاس مشد أو كورسيه كادولي <span class="v-tag">V3</span></div>
+  <div class="div-line"></div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('tool')">تحديد المقاس</div>
+    <div class="tab" onclick="switchTab('chart')">جدول المقاسات</div>
+  </div>
+
+  <!-- TOOL -->
+  <div class="section visible" id="tab-tool">
+
+    <div class="block-label">مقاس الجينز</div>
+    <div class="opt-grid">
+      <div class="opt-btn" onclick="pickJeans('sm',this)">33 – 40</div>
+      <div class="opt-btn" onclick="pickJeans('md',this)">40 – 45</div>
+      <div class="opt-btn" onclick="pickJeans('lg',this)">46+</div>
+    </div>
+
+    <div class="sep"><span class="sep-txt">أو الوزن والطول</span></div>
+
+    <div class="input-row">
+      <div>
+        <div class="field-label">الوزن (كجم)</div>
+        <div class="stepper">
+          <button class="stepper-btn" onclick="step('weight',-1)">−</button>
+          <input type="number" id="weight" placeholder="كجم" min="30" max="200"  />
+          <button class="stepper-btn" onclick="step('weight',1)">+</button>
+        </div>
+      </div>
+      <div>
+        <div class="field-label">الطول (سم)</div>
+        <div class="stepper">
+          <button class="stepper-btn" onclick="step('height',-1)">−</button>
+          <input type="number" id="height" placeholder="سم" min="130" max="210"  />
+          <button class="stepper-btn" onclick="step('height',1)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="fat-section" id="fat-section">
+      <div class="sep" style="margin-top:0;"></div>
+      <div class="block-label" style="margin-top:1rem;">الدهون أكتر في إيه؟</div>
+      <div class="fat-grid">
+        <div class="opt-btn" id="fat-belly" onclick="pickFat('belly',this)">البطن</div>
+        <div class="opt-btn" id="fat-hips"  onclick="pickFat('hips',this)">الأرداف</div>
+        <div class="opt-btn" id="fat-equal" onclick="pickFat('equal',this)">متساوي</div>
+      </div>
+    </div>
+
+    <div class="result-wrap" id="result-wrap">
+      <div class="result-inner">
+        <div class="result-size" id="res-size">—</div>
+        <div class="result-lbl"  id="res-lbl">المقاس المناسب</div>
+        <div class="result-div"  id="res-div"></div>
+        <div class="chips"       id="res-chips"></div>
+      </div>
+      <div class="note-bar" id="res-note"></div>
+      <button class="reset-btn" onclick="resetAll()">مسح وتحديد مقاس جديد</button>
+    </div>
+
+  </div>
+
+  <!-- CHART -->
+  <div class="section" id="tab-chart">
+    <div class="size-cards">
+      <div class="sc">
+        <span class="sc-badge">1X</span>
+        <div class="sc-div"></div>
+        <div class="sc-row"><span class="sc-lbl">الوزن</span><span class="sc-val">60 – 76 كجم</span></div>
+        <div class="sc-row"><span class="sc-lbl">الطول</span><span class="sc-val">150 سم فأكثر</span></div>
+        <div class="sc-row"><span class="sc-lbl">أو وزن حتى 85</span><span class="sc-val">طول 170+ سم</span></div>
+        <div><span class="jp">جينز 33 – 40</span></div>
+      </div>
+      <div class="sc">
+        <span class="sc-badge">2X</span>
+        <div class="sc-div"></div>
+        <div class="sc-row"><span class="sc-lbl">الوزن</span><span class="sc-val">حتى 85 كجم</span></div>
+        <div class="sc-row"><span class="sc-lbl">الطول</span><span class="sc-val">حتى 168 سم</span></div>
+        <div class="sc-row"><span class="sc-lbl">أو وزن 76+ طول</span><span class="sc-val">144–157 سم</span></div>
+        <div class="sc-row"><span class="sc-lbl">أو وزن 95+ طول 172+</span><span class="sc-val">(دهون البطن)</span></div>
+        <div><span class="jp">جينز 40 – 45</span></div>
+      </div>
+      <div class="sc">
+        <span class="sc-badge">3X</span>
+        <div class="sc-div"></div>
+        <div class="sc-row"><span class="sc-lbl">الوزن</span><span class="sc-val">فوق 85 كجم</span></div>
+        <div class="sc-row"><span class="sc-lbl">الطول</span><span class="sc-val">أقل من 165 سم</span></div>
+        <div class="sc-row"><span class="sc-lbl">أو وزن 95+ طول 172+</span><span class="sc-val">(دهون الأرداف)</span></div>
+        <div><span class="jp">جينز 46+</span></div>
+      </div>
+    </div>
+
+    <div class="note-b"><p><span class="dot"></span> الجينز هو الأدق — الوزن والطول للتقدير لو مش موجود.</p></div>
+    <div class="note-b"><p><span class="dot"></span> لو الدهون في الأرداف أكتر → المقاس الأكبر. لو في البطن → المقاس الأصغر.</p></div>
+    <div class="note-b"><p><span class="dot"></span> وزن 55–59 كجم مع طول أقل من 145 سم → 1X. وزن أقل من 55 كجم → المشد غير مناسب.</p></div>
+
+    <div class="info-section-title">معلومات إرشادية</div>
+
+    <div class="info-card">
+      <div class="info-card-header">
+        <span class="info-icon">🤰</span>
+        <span class="info-title">المشد بعد الولادة</span>
+        <span class="info-tag suitable">مناسب</span>
+      </div>
+      <div class="info-body">
+        <p>مشد كادولي مناسب للاستخدام بعد الولادة، لكن مع مراعاة المدة الكافية للتعافي:</p>
+        <div class="info-rule">
+          <span class="rule-dot green"></span>
+          <span><b>ولادة طبيعية:</b> يُنصح بالانتظار من <b>5 إلى 6 أسابيع</b> بعد الولادة قبل البدء في استخدام المشد.</span>
+        </div>
+        <div class="info-rule">
+          <span class="rule-dot orange"></span>
+          <span><b>ولادة قيصرية:</b> لازم يعدي <b>6 أسابيع على الأقل</b> بعد العملية، للتأكد من اكتمال التئام الجرح قبل استخدام المشد.</span>
+        </div>
+        <div class="info-rule">
+          <span class="rule-dot red"></span>
+          <span><b>تنبيه:</b> الاستخدام قبل انتهاء فترة التعافي — وبالذات في القيصرية — ممكن يؤثر سلباً على التئام الجرح. يُنصح دايماً باستشارة الطبيب.</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer"><a href="https://www.cadulli.com/" target="_blank">CADULLI.COM</a></div>
+
+</div>
+<script>
+var st = { jeans: null, fat: null, border: null };
+
+function switchTab(t) {
+  document.getElementById('tab-tool').classList.toggle('visible', t==='tool');
+  document.getElementById('tab-chart').classList.toggle('visible', t==='chart');
+  document.querySelectorAll('.tab').forEach(function(el,i){
+    el.classList.toggle('active',(i===0&&t==='tool')||(i===1&&t==='chart'));
+  });
+}
+
+function step(id, delta) {
+  var el = document.getElementById(id);
+  var cur = parseFloat(el.value);
+  if (isNaN(cur)) cur = (id==='weight') ? 60 : 160;
+  el.value = cur + delta;
+  clearJeans();
+  evaluate();
+}
+
+function clearJeans() {
+  st.jeans = null;
+  document.querySelectorAll('.opt-grid .opt-btn').forEach(function(b){ b.classList.remove('sel'); });
+}
+
+function pickJeans(val, el) {
+  if (st.jeans === val) {
+    st.jeans = null; el.classList.remove('sel');
+  } else {
+    document.querySelectorAll('.opt-grid .opt-btn').forEach(function(b){ b.classList.remove('sel'); });
+    el.classList.add('sel');
+    st.jeans = val;
+    document.getElementById('weight').value = '';
+    document.getElementById('height').value = '';
+  }
+  st.fat = null;
+  document.querySelectorAll('.fat-grid .opt-btn').forEach(function(b){ b.classList.remove('sel'); });
+  evaluate();
+}
+
+function pickFat(val, el) {
+  document.querySelectorAll('.fat-grid .opt-btn').forEach(function(b){ b.classList.remove('sel'); });
+  el.classList.add('sel');
+  st.fat = val;
+  evaluate();
+}
+
+function evaluate() {
+  var fatSec = document.getElementById('fat-section');
+  var rw = document.getElementById('result-wrap');
+  fatSec.classList.remove('visible');
+
+  /* FROM JEANS */
+  if (st.jeans) {
+    if (st.jeans==='sm') { showResult('1X',[{k:'الجينز',v:'33–40'}],''); return; }
+    if (st.jeans==='md') { showResult('2X',[{k:'الجينز',v:'40–45'}],''); return; }
+    if (st.jeans==='lg') { showResult('3X',[{k:'الجينز',v:'46+'}],''); return; }
+  }
+
+  /* FROM WEIGHT + HEIGHT */
+  var w = parseFloat(document.getElementById('weight').value) || null;
+  var h = parseFloat(document.getElementById('height').value) || null;
+  if (!w || !h) { rw.classList.remove('visible'); return; }
+
+  var chips = [{k:'الوزن',v:w+' كجم'},{k:'الطول',v:h+' سم'}];
+
+  // وزن 55-59 وطول أقل من 145 → 1X استثناء
+  if (w >= 55 && w < 60 && h < 145) {
+    showResult('1X', chips, 'وزن خفيف مع طول قصير — الـ 1X هو الأنسب.'); return;
+  }
+
+  // أقل من 60 → غير مناسب
+  if (w < 60) { showInvalid(chips); return; }
+
+  // وزن 76+ وطول 144-157 → 2X
+  if (w >= 76 && h >= 144 && h <= 157) {
+    showResult('2X', chips, 'الطول القصير مع هذا الوزن → الـ 2X هو الأنسب.'); return;
+  }
+
+  // وزن فوق 95 وطول فوق 172 → حسب الدهون
+  if (w > 95 && h > 172) {
+    st.border=['2X','3X'];
+    fatSec.classList.add('visible');
+    if (st.fat) { resolveFat(chips); return; }
+    rw.classList.remove('visible'); return;
+  }
+
+  var size='', note='';
+
+  if (w <= 76) {
+    if (h <= 149) { size='2X'; note='الطول أقل من 150 سم مع هذا الوزن → الـ 2X هو الأنسب.'; }
+    else { size='1X'; }
+  } else if (w <= 85) {
+    if (h >= 170) { size='1X'; note='الطول الكبير بيساعد على الـ 1X.'; }
+    else if (h >= 165 && h < 170) {
+      st.border=['1X','2X']; fatSec.classList.add('visible');
+      if (st.fat) { resolveFat(chips); return; }
+      rw.classList.remove('visible'); return;
+    } else { size='2X'; }
+  } else if (w <= 95) {
+    if (h >= 170) { size='2X'; note='الطول الكبير بيعوّض الوزن.'; }
+    else if (h >= 165 && h < 170) {
+      st.border=['2X','3X']; fatSec.classList.add('visible');
+      if (st.fat) { resolveFat(chips); return; }
+      rw.classList.remove('visible'); return;
+    } else { size='3X'; }
+  } else {
+    size='3X';
+  }
+
+  showResult(size, chips, note);
+}
+
+function resolveFat(chips) {
+  var smaller=st.border[0], bigger=st.border[1];
+  var size, note;
+  var fatLabel = st.fat==='belly'?'البطن':st.fat==='hips'?'الأرداف':'متساوي';
+  if (st.fat==='belly')     { size=smaller; note='الدهون في البطن → المقاس الأصغر '+smaller+' هو الأنسب.'; }
+  else if (st.fat==='hips') { size=bigger;  note='الدهون في الأرداف → المقاس الأكبر '+bigger+' هو الأنسب.'; }
+  else                      { size=bigger;  note='التوزيع متساوي → الأمان في المقاس الأكبر '+bigger+'.'; }
+  showResult(size, chips.concat([{k:'الدهون',v:fatLabel}]), note);
+}
+
+function showResult(size, chips, note) {
+  var sEl=document.getElementById('res-size');
+  var lEl=document.getElementById('res-lbl');
+  var dEl=document.getElementById('res-div');
+  sEl.textContent=size; sEl.className='result-size';
+  lEl.textContent='المقاس المناسب'; dEl.style.display='block';
+  document.getElementById('res-chips').innerHTML=chips.map(function(c){
+    return '<div class="chip">'+c.k+': <b>'+c.v+'</b></div>';
+  }).join('');
+  var nEl=document.getElementById('res-note');
+  nEl.className='note-bar';
+  if (note) { nEl.textContent=note; nEl.classList.add('visible'); }
+  else { nEl.classList.remove('visible'); }
+  document.getElementById('result-wrap').classList.add('visible');
+}
+
+function showInvalid(chips) {
+  var sEl=document.getElementById('res-size');
+  var lEl=document.getElementById('res-lbl');
+  var dEl=document.getElementById('res-div');
+  sEl.textContent='المشد غير مناسب'; sEl.className='result-size invalid';
+  lEl.textContent=''; dEl.style.display='none';
+  document.getElementById('res-chips').innerHTML=chips.map(function(c){
+    return '<div class="chip">'+c.k+': <b>'+c.v+'</b></div>';
+  }).join('');
+  var nEl=document.getElementById('res-note');
+  nEl.className='note-bar danger visible';
+  nEl.textContent='الوزن أقل من 60 كجم — مشد كادولي غير مناسب لهذا الوزن.';
+  document.getElementById('result-wrap').classList.add('visible');
+}
+
+function resetAll() {
+  st={jeans:null,fat:null,border:null};
+  lastW=''; lastH='';
+  document.querySelectorAll('.opt-btn').forEach(function(b){ b.classList.remove('sel'); });
+  document.getElementById('weight').value='';
+  document.getElementById('height').value='';
+  document.getElementById('fat-section').classList.remove('visible');
+  document.getElementById('result-wrap').classList.remove('visible');
+}
+
+// حل نهائي: polling كل 150ms يتحقق لو الوزن أو الطول اتغير
+var lastW = '', lastH = '';
+setInterval(function() {
+  var wEl = document.getElementById('weight');
+  var hEl = document.getElementById('height');
+  if (!wEl || !hEl) return;
+  var wv = wEl.value, hv = hEl.value;
+  if (wv !== lastW || hv !== lastH) {
+    lastW = wv; lastH = hv;
+    if (wv || hv) { clearJeans(); }
+    evaluate();
+  }
+}, 150);
+
+// event listeners احتياطي
+window.addEventListener('DOMContentLoaded', function() {
+  ['weight','height'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    ['input','change','keyup','keydown','paste','cut'].forEach(function(ev) {
+      el.addEventListener(ev, function() {
+        setTimeout(function(){ clearJeans(); evaluate(); }, 10);
+      });
+    });
+  });
+});
+</script>
+</body>
+</html>
