@@ -304,8 +304,8 @@ function evaluate() {
     showResult('2X', chips, 'الطول القصير مع هذا الوزن → الـ 2X هو الأنسب.'); return;
   }
  
-  // ── وزن 77–81 وطول 165–168: سؤال الدهون (أرداف=2X / متساوي=2X / بطن=1X) ──
-  if (w >= 77 && w <= 81 && h >= 165 && h <= 168) {
+  // ── وزن 77–81 وطول 167–169: سؤال الدهون (أرداف=2X / متساوي=2X / بطن=1X) ──
+  if (w >= 77 && w <= 81 && h >= 167 && h <= 169) {
     st.border = ['1X', '2X'];
     fatSec.classList.add('visible');
     if (st.fat) { resolveFat(chips); return; }
@@ -405,4 +405,3 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 </body>
 </html>
- 
