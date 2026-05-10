@@ -102,7 +102,7 @@
 <div class="app">
 
   <div class="brand">Cadulli</div>
-  <div class="brand-sub">تحديد مقاس مشد أو كورسيه كادولي <span class="v-tag">V5</span></div>
+  <div class="brand-sub">تحديد مقاس مشد أو كورسيه كادولي <span class="v-tag">V4</span></div>
   <div class="div-line"></div>
 
   <div class="tabs">
@@ -294,24 +294,13 @@ function evaluate() {
 
   var chips = [{k:'الوزن',v:w+' كجم'},{k:'الطول',v:h+' سم'}];
 
-  // وزن أكثر من 125 → غير مناسب
-  if (w > 125) { showInvalid(chips, 'الوزن أكثر من 125 كجم — مشد كادولي غير مناسب لهذا الوزن.'); return; }
-
-  // وزن 120+ وطول 160 أو أقل → غير مناسب
-  if (w >= 120 && h <= 160) { showInvalid(chips, 'هذا الوزن مع هذا الطول — مشد كادولي غير مناسب.'); return; }
-
   // وزن 55-59 وطول أقل من 145 → 1X استثناء
   if (w >= 55 && w < 60 && h < 145) {
     showResult('1X', chips, 'وزن خفيف مع طول قصير — الـ 1X هو الأنسب.'); return;
   }
 
   // أقل من 60 → غير مناسب
-  if (w < 60) { showInvalid(chips, 'الوزن أقل من 60 كجم — مشد كادولي غير مناسب لهذا الوزن.'); return; }
-
-  // وزن 74+ وطول 159 أو أقل → 2X
-  if (w >= 74 && h <= 159) {
-    showResult('2X', chips, 'الطول القصير مع هذا الوزن → الـ 2X هو الأنسب.'); return;
-  }
+  if (w < 60) { showInvalid(chips); return; }
 
   // وزن 86+ وطول أقل من 160 → 3X
   if (w >= 86 && h < 160) {
@@ -383,7 +372,7 @@ function showResult(size, chips, note) {
   document.getElementById('result-wrap').classList.add('visible');
 }
 
-function showInvalid(chips, msg) {
+function showInvalid(chips) {
   var sEl=document.getElementById('res-size');
   var lEl=document.getElementById('res-lbl');
   var dEl=document.getElementById('res-div');
@@ -394,12 +383,13 @@ function showInvalid(chips, msg) {
   }).join('');
   var nEl=document.getElementById('res-note');
   nEl.className='note-bar danger visible';
-  nEl.textContent = msg || 'مشد كادولي غير مناسب لهذا الوزن.';
+  nEl.textContent='الوزن أقل من 60 كجم — مشد كادولي غير مناسب لهذا الوزن.';
   document.getElementById('result-wrap').classList.add('visible');
 }
 
 function resetAll() {
   st={jeans:null,fat:null,border:null};
+  lastW=''; lastH='';
   document.querySelectorAll('.opt-btn').forEach(function(b){ b.classList.remove('sel'); });
   document.getElementById('weight').value='';
   document.getElementById('height').value='';
@@ -407,24 +397,31 @@ function resetAll() {
   document.getElementById('result-wrap').classList.remove('visible');
 }
 
-// Mobile-compatible: events على كل أنواع الإدخال
-document.addEventListener('DOMContentLoaded', function() {
+// حل نهائي: polling كل 150ms يتحقق لو الوزن أو الطول اتغير
+var lastW = '', lastH = '';
+setInterval(function() {
   var wEl = document.getElementById('weight');
   var hEl = document.getElementById('height');
-
-  function triggerEvaluate() {
-    clearJeans();
+  if (!wEl || !hEl) return;
+  var wv = wEl.value, hv = hEl.value;
+  if (wv !== lastW || hv !== lastH) {
+    lastW = wv; lastH = hv;
+    if (wv || hv) { clearJeans(); }
     evaluate();
   }
+}, 150);
 
-  ['input','change','keyup','keydown','paste','cut','blur','touchend'].forEach(function(ev) {
-    wEl.addEventListener(ev, function(){ setTimeout(triggerEvaluate, 0); }, { passive: true });
-    hEl.addEventListener(ev, function(){ setTimeout(triggerEvaluate, 0); }, { passive: true });
+// event listeners احتياطي
+window.addEventListener('DOMContentLoaded', function() {
+  ['weight','height'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    ['input','change','keyup','keydown','paste','cut'].forEach(function(ev) {
+      el.addEventListener(ev, function() {
+        setTimeout(function(){ clearJeans(); evaluate(); }, 10);
+      });
+    });
   });
-
-  // للموبايل: لما الكيبورد يقفل بعد الكتابة
-  wEl.addEventListener('focusout', function(){ setTimeout(triggerEvaluate, 100); });
-  hEl.addEventListener('focusout', function(){ setTimeout(triggerEvaluate, 100); });
 });
 </script>
 </body>
