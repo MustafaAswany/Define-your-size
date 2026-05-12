@@ -314,12 +314,12 @@ function evaluate() {
  
   // ── وزن أكثر من 85 ──
   if (w > 85) {
-    if (w >= 100) { showResult('3X', chips, ''); return; }
-    if (w >= 92) {
-      if (h >= 170) { showResult('2X', chips, 'الطول الكبير بيعوّض الوزن → الـ 2X هو الأنسب.'); return; }
+    if (w >= 98) { showResult('3X', chips, ''); return; }
+    if (w >= 90) {
+      if (h > 169) { showResult('2X', chips, 'الطول الكبير بيعوّض الوزن → الـ 2X هو الأنسب.'); return; }
       showResult('3X', chips, ''); return;
     }
-    // وزن 86–91
+    // وزن 86–89
     if (h >= 170) { showResult('1X', chips, 'الطول الكبير بيساعد على الـ 1X.'); return; }
     if (h >= 152) { showResult('2X', chips, ''); return; }
     showResult('3X', chips, 'الطول القصير مع الوزن الثقيل → الـ 3X هو الأنسب.'); return;
@@ -404,4 +404,3 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 </body>
-</html>
