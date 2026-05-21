@@ -127,7 +127,7 @@
         <div class="field-label">الوزن (كجم)</div>
         <div class="stepper">
           <button class="stepper-btn" onclick="step('weight',-1)">−</button>
-          <input type="number" id="weight" placeholder="كجم" min="30" max="200"  />
+          <input type="number" id="weight" placeholder="كجم" min="30" max="200" tabindex="1" />
           <button class="stepper-btn" onclick="step('weight',1)">+</button>
         </div>
       </div>
@@ -135,7 +135,7 @@
         <div class="field-label">الطول (سم)</div>
         <div class="stepper">
           <button class="stepper-btn" onclick="step('height',-1)">−</button>
-          <input type="number" id="height" placeholder="سم" min="130" max="210"  />
+          <input type="number" id="height" placeholder="سم" min="130" max="210" tabindex="2" />
           <button class="stepper-btn" onclick="step('height',1)">+</button>
         </div>
       </div>
@@ -401,10 +401,18 @@ function resetAll() {
   document.getElementById('result-wrap').classList.remove('visible');
 }
 
-// Mobile-compatible: events على كل أنواع الإدخال
+// Tab/Enter من الوزن ينقل للطول
 document.addEventListener('DOMContentLoaded', function() {
   var wEl = document.getElementById('weight');
   var hEl = document.getElementById('height');
+
+  wEl.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      hEl.focus();
+      hEl.select();
+    }
+  });
 
   function triggerEvaluate() {
     clearJeans();
