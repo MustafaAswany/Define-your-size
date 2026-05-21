@@ -36,7 +36,7 @@
 >       4. ### طريقة 2: عبر الإنترنت (GitHub Pages)
 >       5. سيكون متاحاً قريباً على:
 >       6. ```
->          https://mustafaaswany.github.io/Define-your-size/cadulli-size-tool-V3.html
+>          https://mustafaaswany.github.io/Define-your-size/cadulli-size-tool-V5.html
 >          ```
 >
 > ### طريقة 3: الموقع الرسمي
