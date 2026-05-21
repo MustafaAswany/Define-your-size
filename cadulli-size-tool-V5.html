@@ -411,8 +411,14 @@ document.addEventListener('DOMContentLoaded', function() {
     evaluate();
   }
 
-  // Navigation: Enter على الوزن ينقل للطول
+  // Tab على الوزن ينقل للطول مباشرة ويتخطى الزراير
   wEl.addEventListener('keydown', function(e) {
+    if (e.key === 'Tab' || e.keyCode === 9) {
+      e.preventDefault();
+      hEl.focus();
+      hEl.select();
+      return;
+    }
     if (e.key === 'Enter' || e.keyCode === 13) {
       e.preventDefault();
       hEl.focus();
