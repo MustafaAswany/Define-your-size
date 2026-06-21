@@ -329,14 +329,16 @@ function evaluate() {
   if (w > 85) {
     // وزن أكثر من 97 → 3X دايماً
     if (w > 97) { showResult('3X', chips, ''); return; }
-    // وزن 93–97 وطول 170–180 → 2X
+    // وزن 93–97 وطول 170–180 → 2X (أولوية قبل قاعدة الـ 187)
     if (w >= 93 && w <= 97 && h >= 170 && h <= 180) {
       showResult('2X', chips, 'الطول الكبير بيعوّض الوزن → الـ 2X هو الأنسب.'); return;
     }
-    // وزن 90–97 وطول أقل من 170 → 3X
-    if (w >= 90) {
-      showResult('3X', chips, ''); return;
-    }
+    // وزن 93+ وطول أقل من 187 → 3X
+    if (w >= 93 && h < 187) { showResult('3X', chips, ''); return; }
+    // وزن 89+ وطول أقل من 170 → 3X
+    if (w >= 89 && h < 170) { showResult('3X', chips, ''); return; }
+    // وزن 90–97 (طول 170+ ولم يدخل تحت الحالات السابقة)
+    if (w >= 90) { showResult('3X', chips, ''); return; }
     // وزن 86–89
     if (h >= 170) { showResult('1X', chips, 'الطول الكبير بيساعد على الـ 1X.'); return; }
     if (h >= 152) { showResult('2X', chips, ''); return; }
@@ -411,14 +413,8 @@ document.addEventListener('DOMContentLoaded', function() {
     evaluate();
   }
 
-  // Tab على الوزن ينقل للطول مباشرة ويتخطى الزراير
+  // Enter على الوزن ينقل للطول
   wEl.addEventListener('keydown', function(e) {
-    if (e.key === 'Tab' || e.keyCode === 9) {
-      e.preventDefault();
-      hEl.focus();
-      hEl.select();
-      return;
-    }
     if (e.key === 'Enter' || e.keyCode === 13) {
       e.preventDefault();
       hEl.focus();
